@@ -43,7 +43,6 @@ export class WelcomeComponent {
 
   @Component({
     selector: 'app-root',
-    standalone: true,
     imports: [CommonModule, NgxEchartsDirective],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],

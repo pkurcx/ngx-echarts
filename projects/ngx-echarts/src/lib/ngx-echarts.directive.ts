@@ -5,7 +5,6 @@ import {
   ElementRef,
   EventEmitter,
   inject,
-  InjectionToken,
   input,
   NgZone,
   OnChanges,
@@ -19,18 +18,9 @@ import { switchMap, throttleTime } from 'rxjs/operators';
 import { ChangeFilterV2 } from './change-filter-v2';
 import type { ECElementEvent, ECharts, EChartsCoreOption } from 'echarts/core';
 import { outputFromObservable, outputToObservable } from '@angular/core/rxjs-interop';
-
-export interface NgxEchartsConfig {
-  echarts: any | (() => Promise<any>);
-  theme?: string | ThemeOption;
-}
-
-export type ThemeOption = Record<string, any>;
-
-export const NGX_ECHARTS_CONFIG = new InjectionToken<NgxEchartsConfig>('NGX_ECHARTS_CONFIG');
+import { NGX_ECHARTS_CONFIG, NgxEchartsConfig, ThemeOption } from './config';
 
 @Directive({
-  standalone: true,
   selector: 'echarts, [echarts]',
   exportAs: 'echarts',
 })
