@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AppMenu, APP_MENUS } from '../../menus';
@@ -14,11 +14,15 @@ interface AppMenuEx extends AppMenu {
   standalone: false,
 })
 export class AppMenuComponent {
+  private readonly router = inject(Router);
+
   @Input() isCollapsed: boolean;
   menus: AppMenuEx[];
   currentUrl: string;
 
-  constructor(private router: Router) {
+  constructor() {
+    const router = this.router;
+
     router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: NavigationEnd) => {
       this.currentUrl = e.url;
     });

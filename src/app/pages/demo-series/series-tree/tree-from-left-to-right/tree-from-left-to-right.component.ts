@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -16,12 +16,13 @@ import component from './tree-from-left-to-right.component.txt';
   standalone: false,
 })
 export class TreeFromLeftToRightComponent implements OnInit {
+  private readonly http = inject(HttpClient);
+
   // IGNORE START
   html = html;
   component = component;
   // IGNORE END
   options: Observable<EChartsCoreOption>;
-  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     this.options = this.http.get<any>('assets/data/flare.json', { responseType: 'json' }).pipe(
