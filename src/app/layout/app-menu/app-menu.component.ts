@@ -3,7 +3,6 @@ import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/ro
 import { filter } from 'rxjs/operators';
 import { AppMenu, APP_MENUS } from '../../menus';
 import { NzMenuDirective, NzMenuItemComponent, NzSubMenuComponent } from 'ng-zorro-antd/menu';
-import { NgFor, NgIf } from '@angular/common';
 import { ɵNzTransitionPatchDirective } from 'ng-zorro-antd/core/transition-patch';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 
@@ -16,8 +15,6 @@ interface AppMenuEx extends AppMenu {
   templateUrl: './app-menu.component.html',
   styleUrls: ['./app-menu.component.scss'],
   imports: [
-    NgFor,
-    NgIf,
     NzIconDirective,
     NzMenuDirective,
     NzMenuItemComponent,
