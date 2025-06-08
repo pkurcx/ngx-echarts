@@ -14,17 +14,20 @@ import { BasicInstanceComponent } from './basic/basic-instance/basic-instance.co
 import { BasicDatasetComponent } from './basic/basic-dataset/basic-dataset.component';
 
 @NgModule({
-  declarations: [
+  imports: [
     BasicComponent,
-    BasicSimpleComponent,
+    BasicDatasetComponent,
     BasicEventsComponent,
-    BasicThemesComponent,
-    BasicLoadingComponent,
-    BasicUpdateComponent,
     BasicInitOptsComponent,
     BasicInstanceComponent,
-    BasicDatasetComponent,
+    BasicLoadingComponent,
+    BasicSimpleComponent,
+    BasicThemesComponent,
+    BasicUpdateComponent,
+    CommonModule,
+    DemoBasicRoutingModule,
+    NgxEchartsModule,
+    SharedModule,
   ],
-  imports: [CommonModule, SharedModule, NgxEchartsModule, DemoBasicRoutingModule],
 })
 export class DemoBasicModule {}

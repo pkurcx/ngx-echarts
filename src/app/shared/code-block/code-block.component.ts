@@ -1,10 +1,13 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { NzTabSetComponent, NzTabComponent } from 'ng-zorro-antd/tabs';
+import { NgIf } from '@angular/common';
+import { MarkdownComponent, LanguagePipe } from 'ngx-markdown';
 
 @Component({
   selector: 'app-code-block',
   templateUrl: './code-block.component.html',
   styleUrls: ['./code-block.component.scss'],
-  standalone: false,
+  imports: [NzTabSetComponent, NgIf, NzTabComponent, MarkdownComponent, LanguagePipe],
 })
 export class CodeBlockComponent implements OnInit {
   @Input() html: string;

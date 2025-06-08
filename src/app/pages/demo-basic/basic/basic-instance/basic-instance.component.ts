@@ -4,13 +4,26 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 // IGNORE START
 import html from './basic-instance.component.html';
 import component from './basic-instance.component.txt';
+import { NzSpaceCompactItemDirective } from 'ng-zorro-antd/space';
+import { NzButtonComponent } from 'ng-zorro-antd/button';
+import { NzWaveDirective } from 'ng-zorro-antd/core/wave';
+import { ɵNzTransitionPatchDirective } from 'ng-zorro-antd/core/transition-patch';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { CodeBlockComponent } from '../../../../shared/code-block/code-block.component';
 // IGNORE END
 
 @Component({
   selector: 'app-basic-instance',
   templateUrl: './basic-instance.component.html',
   styleUrls: ['./basic-instance.component.scss'],
-  standalone: false,
+  imports: [
+    CodeBlockComponent,
+    NgxEchartsDirective,
+    NzButtonComponent,
+    NzSpaceCompactItemDirective,
+    NzWaveDirective,
+    ɵNzTransitionPatchDirective,
+  ],
 })
 export class BasicInstanceComponent {
   private readonly msg = inject(NzMessageService);

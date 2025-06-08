@@ -1,7 +1,11 @@
 import { Component, Input, inject } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AppMenu, APP_MENUS } from '../../menus';
+import { NzMenuDirective, NzMenuItemComponent, NzSubMenuComponent } from 'ng-zorro-antd/menu';
+import { NgFor, NgIf } from '@angular/common';
+import { ɵNzTransitionPatchDirective } from 'ng-zorro-antd/core/transition-patch';
+import { NzIconDirective } from 'ng-zorro-antd/icon';
 
 interface AppMenuEx extends AppMenu {
   pathRegex: RegExp;
@@ -11,7 +15,17 @@ interface AppMenuEx extends AppMenu {
   selector: 'app-menu',
   templateUrl: './app-menu.component.html',
   styleUrls: ['./app-menu.component.scss'],
-  standalone: false,
+  imports: [
+    NgFor,
+    NgIf,
+    NzIconDirective,
+    NzMenuDirective,
+    NzMenuItemComponent,
+    NzSubMenuComponent,
+    RouterLink,
+    RouterLinkActive,
+    ɵNzTransitionPatchDirective,
+  ],
 })
 export class AppMenuComponent {
   private readonly router = inject(Router);

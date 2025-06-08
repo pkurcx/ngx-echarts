@@ -1,10 +1,24 @@
 import { Component } from '@angular/core';
+import { NzSpaceCompactItemDirective } from 'ng-zorro-antd/space';
+import { NzButtonComponent } from 'ng-zorro-antd/button';
+import { ɵNzTransitionPatchDirective } from 'ng-zorro-antd/core/transition-patch';
+import { NzIconDirective } from 'ng-zorro-antd/icon';
+import { NzRowDirective, NzColDirective } from 'ng-zorro-antd/grid';
+import { MarkdownComponent } from 'ngx-markdown';
 
 @Component({
   selector: 'app-welcome',
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss'],
-  standalone: false,
+  imports: [
+    MarkdownComponent,
+    NzButtonComponent,
+    NzColDirective,
+    NzIconDirective,
+    NzRowDirective,
+    NzSpaceCompactItemDirective,
+    ɵNzTransitionPatchDirective,
+  ],
 })
 export class WelcomeComponent {
   scriptText = `
