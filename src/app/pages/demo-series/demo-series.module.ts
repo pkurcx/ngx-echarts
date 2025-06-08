@@ -14,17 +14,20 @@ import { HeatmapCalendarComponent } from './series-heatmap/heatmap-calendar/heat
 import { HeatmapDiscreteComponent } from './series-heatmap/heatmap-discrete/heatmap-discrete.component';
 
 @NgModule({
-  declarations: [
-    SeriesGraphComponent,
+  imports: [
+    CommonModule,
+    DemoSeriesRoutingModule,
     GraphForceLayoutComponent,
     GraphSimpleComponent,
-    SeriesTreeComponent,
-    TreeFromLeftToRightComponent,
-    TreeRadialComponent,
-    SeriesHeatmapComponent,
     HeatmapCalendarComponent,
     HeatmapDiscreteComponent,
+    NgxEchartsModule,
+    SeriesGraphComponent,
+    SeriesHeatmapComponent,
+    SeriesTreeComponent,
+    SharedModule,
+    TreeFromLeftToRightComponent,
+    TreeRadialComponent,
   ],
-  imports: [CommonModule, SharedModule, NgxEchartsModule, DemoSeriesRoutingModule],
 })
 export class DemoSeriesModule {}
