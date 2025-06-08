@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, input } from '@angular/core';
 import { NzTabSetComponent, NzTabComponent } from 'ng-zorro-antd/tabs';
 import { MarkdownComponent, LanguagePipe } from 'ngx-markdown';
 
@@ -9,10 +9,10 @@ import { MarkdownComponent, LanguagePipe } from 'ngx-markdown';
   imports: [NzTabSetComponent, NzTabComponent, MarkdownComponent, LanguagePipe],
 })
 export class CodeBlockComponent implements OnInit {
-  @Input() html: string;
-  @Input() component: string;
-  @Input() scss: string;
-  @Input() data: string;
+  readonly html = input<string>(undefined);
+  readonly component = input<string>(undefined);
+  readonly scss = input<string>(undefined);
+  readonly data = input<string>(undefined);
   htmlCode: string;
   componentCode: string;
   scssCode: string;
@@ -21,23 +21,27 @@ export class CodeBlockComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    if (this.html) {
-      this.htmlCode = this.html.match(/DEMO START -->\n((.*\n)*)<!-- DEMO END/)[1];
+    const html = this.html();
+    if (html) {
+      this.htmlCode = html.match(/DEMO START -->\n((.*\n)*)<!-- DEMO END/)[1];
     }
 
-    if (this.component) {
-      this.componentCode = this.component.replace(
+    const component = this.component();
+    if (component) {
+      this.componentCode = component.replace(
         / *\/\/ IGNORE START[\s\S]*?\/\/ IGNORE END\n/g,
         ''
       );
     }
 
-    if (this.scss) {
-      this.scssCode = this.scss.replace(/ *\/\/ IGNORE START[\s\S]*?\/\/ IGNORE END\n/g, '');
+    const scss = this.scss();
+    if (scss) {
+      this.scssCode = scss.replace(/ *\/\/ IGNORE START[\s\S]*?\/\/ IGNORE END\n/g, '');
     }
 
-    if (this.data) {
-      this.dataCode = this.data.replace(/ *\/\/ IGNORE START[\s\S]*?\/\/ IGNORE END\n/g, '');
+    const data = this.data();
+    if (data) {
+      this.dataCode = data.replace(/ *\/\/ IGNORE START[\s\S]*?\/\/ IGNORE END\n/g, '');
     }
   }
 }

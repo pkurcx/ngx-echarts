@@ -1,22 +1,24 @@
 import {
   AfterViewInit,
+  booleanAttribute,
   Directive,
   ElementRef,
   EventEmitter,
+  inject,
   InjectionToken,
-  Input,
+  input,
   NgZone,
   OnChanges,
   OnDestroy,
   OnInit,
-  Output,
+  output,
   SimpleChanges,
-  inject,
 } from '@angular/core';
-import { Observable, ReplaySubject, Subject, Subscription, asyncScheduler } from 'rxjs';
+import { asyncScheduler, Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
 import { switchMap, throttleTime } from 'rxjs/operators';
 import { ChangeFilterV2 } from './change-filter-v2';
-import type { EChartsCoreOption, ECharts, ECElementEvent } from 'echarts/core';
+import type { ECElementEvent, ECharts, EChartsCoreOption } from 'echarts/core';
+import { outputFromObservable, outputToObservable } from '@angular/core/rxjs-interop';
 
 export interface NgxEchartsConfig {
   echarts: any | (() => Promise<any>);
@@ -35,72 +37,101 @@ export const NGX_ECHARTS_CONFIG = new InjectionToken<NgxEchartsConfig>('NGX_ECHA
 export class NgxEchartsDirective implements OnChanges, OnDestroy, OnInit, AfterViewInit {
   private readonly el = inject(ElementRef);
   private readonly ngZone = inject(NgZone);
+  private readonly config = inject<NgxEchartsConfig>(NGX_ECHARTS_CONFIG);
 
-  @Input() options: EChartsCoreOption | null = null;
-  @Input() theme: string | ThemeOption | null = null;
-  @Input() initOpts: {
+  readonly options = input<EChartsCoreOption | null>(null);
+  readonly theme: string | ThemeOption | null = input<string | ThemeOption | null>(
+    this.config.theme || null
+  );
+  readonly initOpts = input<{
     devicePixelRatio?: number;
     renderer?: string;
     width?: number | string;
     height?: number | string;
     locale?: string;
-  } | null = null;
-  @Input() merge: EChartsCoreOption | null = null;
-  @Input() autoResize = true;
-  @Input() loading = false;
-  @Input() loadingType = 'default';
-  @Input() loadingOpts: object | null = null;
+  } | null>(null);
+  readonly merge = input<EChartsCoreOption | null>(null);
+  readonly autoResize = input(true, { transform: booleanAttribute });
+  readonly loading = input(false);
+  readonly loadingType = input('default');
+  readonly loadingOpts = input<object | null>(null);
 
   // ngx-echarts events
-  @Output() chartInit = new EventEmitter<ECharts>();
-  @Output() optionsError = new EventEmitter<Error>();
+  readonly chartInit = output<ECharts>();
+  readonly optionsError = output<Error>();
 
   // echarts mouse events
-  @Output() chartClick = this.createLazyEvent<ECElementEvent>('click');
-  @Output() chartDblClick = this.createLazyEvent<ECElementEvent>('dblclick');
-  @Output() chartMouseDown = this.createLazyEvent<ECElementEvent>('mousedown');
-  @Output() chartMouseMove = this.createLazyEvent<ECElementEvent>('mousemove');
-  @Output() chartMouseUp = this.createLazyEvent<ECElementEvent>('mouseup');
-  @Output() chartMouseOver = this.createLazyEvent<ECElementEvent>('mouseover');
-  @Output() chartMouseOut = this.createLazyEvent<ECElementEvent>('mouseout');
-  @Output() chartGlobalOut = this.createLazyEvent<ECElementEvent>('globalout');
-  @Output() chartContextMenu = this.createLazyEvent<ECElementEvent>('contextmenu');
+  readonly chartClick = outputFromObservable(this.createLazyEvent<ECElementEvent>('click'));
+  readonly chartDblClick = outputFromObservable(this.createLazyEvent<ECElementEvent>('dblclick'));
+  readonly chartMouseDown = outputFromObservable(this.createLazyEvent<ECElementEvent>('mousedown'));
+  readonly chartMouseMove = outputFromObservable(this.createLazyEvent<ECElementEvent>('mousemove'));
+  readonly chartMouseUp = outputFromObservable(this.createLazyEvent<ECElementEvent>('mouseup'));
+  readonly chartMouseOver = outputFromObservable(this.createLazyEvent<ECElementEvent>('mouseover'));
+  readonly chartMouseOut = outputFromObservable(this.createLazyEvent<ECElementEvent>('mouseout'));
+  readonly chartGlobalOut = outputFromObservable(this.createLazyEvent<ECElementEvent>('globalout'));
+  readonly chartContextMenu = outputFromObservable(
+    this.createLazyEvent<ECElementEvent>('contextmenu')
+  );
 
   // echarts events
-  @Output() chartHighlight = this.createLazyEvent<any>('highlight');
-  @Output() chartDownplay = this.createLazyEvent<any>('downplay');
-  @Output() chartSelectChanged = this.createLazyEvent<any>('selectchanged');
-  @Output() chartLegendSelectChanged = this.createLazyEvent<any>('legendselectchanged');
-  @Output() chartLegendSelected = this.createLazyEvent<any>('legendselected');
-  @Output() chartLegendUnselected = this.createLazyEvent<any>('legendunselected');
-  @Output() chartLegendLegendSelectAll = this.createLazyEvent<any>('legendselectall');
-  @Output() chartLegendLegendInverseSelect = this.createLazyEvent<any>('legendinverseselect');
-  @Output() chartLegendScroll = this.createLazyEvent<any>('legendscroll');
-  @Output() chartDataZoom = this.createLazyEvent<any>('datazoom');
-  @Output() chartDataRangeSelected = this.createLazyEvent<any>('datarangeselected');
-  @Output() chartGraphRoam = this.createLazyEvent<any>('graphroam');
-  @Output() chartGeoRoam = this.createLazyEvent<any>('georoam');
-  @Output() chartTreeRoam = this.createLazyEvent<any>('treeroam');
-  @Output() chartTimelineChanged = this.createLazyEvent<any>('timelinechanged');
-  @Output() chartTimelinePlayChanged = this.createLazyEvent<any>('timelineplaychanged');
-  @Output() chartRestore = this.createLazyEvent<any>('restore');
-  @Output() chartDataViewChanged = this.createLazyEvent<any>('dataviewchanged');
-  @Output() chartMagicTypeChanged = this.createLazyEvent<any>('magictypechanged');
-  @Output() chartGeoSelectChanged = this.createLazyEvent<any>('geoselectchanged');
-  @Output() chartGeoSelected = this.createLazyEvent<any>('geoselected');
-  @Output() chartGeoUnselected = this.createLazyEvent<any>('geounselected');
-  @Output() chartAxisAreaSelected = this.createLazyEvent<any>('axisareaselected');
-  @Output() chartBrush = this.createLazyEvent<any>('brush');
-  @Output() chartBrushEnd = this.createLazyEvent<any>('brushend');
-  @Output() chartBrushSelected = this.createLazyEvent<any>('brushselected');
-  @Output() chartGlobalCursorTaken = this.createLazyEvent<any>('globalcursortaken');
-  @Output() chartRendered = this.createLazyEvent<any>('rendered');
-  @Output() chartFinished = this.createLazyEvent<any>('finished');
+  readonly chartHighlight = outputFromObservable(this.createLazyEvent<any>('highlight'));
+  readonly chartDownplay = outputFromObservable(this.createLazyEvent<any>('downplay'));
+  readonly chartSelectChanged = outputFromObservable(this.createLazyEvent<any>('selectchanged'));
+  readonly chartLegendSelectChanged = outputFromObservable(
+    this.createLazyEvent<any>('legendselectchanged')
+  );
+  readonly chartLegendSelected = outputFromObservable(this.createLazyEvent<any>('legendselected'));
+  readonly chartLegendUnselected = outputFromObservable(
+    this.createLazyEvent<any>('legendunselected')
+  );
+  readonly chartLegendLegendSelectAll = outputFromObservable(
+    this.createLazyEvent<any>('legendselectall')
+  );
+  readonly chartLegendLegendInverseSelect = outputFromObservable(
+    this.createLazyEvent<any>('legendinverseselect')
+  );
+  readonly chartLegendScroll = outputFromObservable(this.createLazyEvent<any>('legendscroll'));
+  readonly chartDataZoom = outputFromObservable(this.createLazyEvent<any>('datazoom'));
+  readonly chartDataRangeSelected = outputFromObservable(
+    this.createLazyEvent<any>('datarangeselected')
+  );
+  readonly chartGraphRoam = outputFromObservable(this.createLazyEvent<any>('graphroam'));
+  readonly chartGeoRoam = outputFromObservable(this.createLazyEvent<any>('georoam'));
+  readonly chartTreeRoam = outputFromObservable(this.createLazyEvent<any>('treeroam'));
+  readonly chartTimelineChanged = outputFromObservable(
+    this.createLazyEvent<any>('timelinechanged')
+  );
+  readonly chartTimelinePlayChanged = outputFromObservable(
+    this.createLazyEvent<any>('timelineplaychanged')
+  );
+  readonly chartRestore = outputFromObservable(this.createLazyEvent<any>('restore'));
+  readonly chartDataViewChanged = outputFromObservable(
+    this.createLazyEvent<any>('dataviewchanged')
+  );
+  readonly chartMagicTypeChanged = outputFromObservable(
+    this.createLazyEvent<any>('magictypechanged')
+  );
+  readonly chartGeoSelectChanged = outputFromObservable(
+    this.createLazyEvent<any>('geoselectchanged')
+  );
+  readonly chartGeoSelected = outputFromObservable(this.createLazyEvent<any>('geoselected'));
+  readonly chartGeoUnselected = outputFromObservable(this.createLazyEvent<any>('geounselected'));
+  readonly chartAxisAreaSelected = outputFromObservable(
+    this.createLazyEvent<any>('axisareaselected')
+  );
+  readonly chartBrush = outputFromObservable(this.createLazyEvent<any>('brush'));
+  readonly chartBrushEnd = outputFromObservable(this.createLazyEvent<any>('brushend'));
+  readonly chartBrushSelected = outputFromObservable(this.createLazyEvent<any>('brushselected'));
+  readonly chartGlobalCursorTaken = outputFromObservable(
+    this.createLazyEvent<any>('globalcursortaken')
+  );
+  readonly chartRendered = outputFromObservable(this.createLazyEvent<any>('rendered'));
+  readonly chartFinished = outputFromObservable(this.createLazyEvent<any>('finished'));
 
   public animationFrameID = null;
   private chart: ECharts;
   private chart$ = new ReplaySubject<ECharts>(1);
-  private echarts: any;
+  private echarts: any = this.config.echarts;
   private resizeOb: ResizeObserver;
   private resize$ = new Subject<void>();
   private resizeSub: Subscription;
@@ -108,13 +139,6 @@ export class NgxEchartsDirective implements OnChanges, OnDestroy, OnInit, AfterV
   private changeFilter = new ChangeFilterV2();
   private loadingSub: Subscription;
   private resizeObFired: boolean = false;
-
-  constructor() {
-    const config = inject<NgxEchartsConfig>(NGX_ECHARTS_CONFIG);
-
-    this.echarts = config.echarts;
-    this.theme = config.theme || null;
-  }
 
   ngOnChanges(changes: SimpleChanges) {
     this.changeFilter.doFilter(changes);
@@ -128,7 +152,7 @@ export class NgxEchartsDirective implements OnChanges, OnDestroy, OnInit, AfterV
       .pipe(throttleTime(100, asyncScheduler, { leading: false, trailing: true }))
       .subscribe(() => this.resize());
 
-    if (this.autoResize) {
+    if (this.autoResize()) {
       // https://github.com/xieziyu/ngx-echarts/issues/413
       this.resizeOb = this.ngZone.runOutsideAngular(
         () =>
@@ -199,11 +223,11 @@ export class NgxEchartsDirective implements OnChanges, OnDestroy, OnInit, AfterV
   private toggleLoading(loading: boolean) {
     if (this.chart) {
       loading
-        ? this.chart.showLoading(this.loadingType, this.loadingOpts)
+        ? this.chart.showLoading(this.loadingType(), this.loadingOpts())
         : this.chart.hideLoading();
     } else {
       this.loadingSub = this.chart$.subscribe(chart =>
-        loading ? chart.showLoading(this.loadingType, this.loadingOpts) : chart.hideLoading()
+        loading ? chart.showLoading(this.loadingType(), this.loadingOpts()) : chart.hideLoading()
       );
     }
   }
@@ -243,15 +267,16 @@ export class NgxEchartsDirective implements OnChanges, OnDestroy, OnInit, AfterV
       const load =
         typeof this.echarts === 'function' ? this.echarts : () => Promise.resolve(this.echarts);
 
-      return load().then(({ init }) => init(dom, this.theme, this.initOpts));
+      return load().then(({ init }) => init(dom, this.theme, this.initOpts()));
     });
   }
 
   private async initChart() {
-    await this.onOptionsChange(this.options);
+    await this.onOptionsChange(this.options());
 
-    if (this.merge && this.chart) {
-      this.setOption(this.merge);
+    const merge = this.merge();
+    if (merge && this.chart) {
+      this.setOption(merge);
     }
   }
 
@@ -261,19 +286,19 @@ export class NgxEchartsDirective implements OnChanges, OnDestroy, OnInit, AfterV
     }
 
     if (this.chart) {
-      this.setOption(this.options, true);
+      this.setOption(this.options(), true);
     } else {
       this.chart = await this.createChart();
       this.chart$.next(this.chart);
       this.chartInit.emit(this.chart);
-      this.setOption(this.options, true);
+      this.setOption(this.options(), true);
     }
   }
 
-  // allows to lazily bind to only those events that are requested through the `@Output` by parent components
+  // allows to lazily bind to only those events that are requested through the `output()` by parent components
   // see https://stackoverflow.com/questions/51787972/optimal-reentering-the-ngzone-from-eventemitter-event for more info
-  private createLazyEvent<T>(eventName: string): EventEmitter<T> {
-    return this.chartInit.pipe(
+  private createLazyEvent<T>(eventName: string): Observable<T> {
+    return outputToObservable(this.chartInit).pipe(
       switchMap(
         (chart: any) =>
           new Observable(observer => {

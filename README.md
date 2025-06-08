@@ -288,8 +288,8 @@ As ECharts supports the `'click'`, `'dblclick'`, `'mousedown'`, `'mouseup'`, `'m
 
 It supports following event outputs:
 
-| @Output                        | Event                                  |
-| ------------------------------ | -------------------------------------- |
+| output()                       | Event                                  |
+|--------------------------------| -------------------------------------- |
 | chartInit                      | Emitted when the chart is initialized  |
 | chartClick                     | echarts event: `'click'`               |
 | chartDblClick                  | echarts event: `'dblclick'`            |

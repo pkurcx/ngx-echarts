@@ -1,4 +1,4 @@
-<ul nz-menu nzTheme="dark" [nzMode]="'inline'" [nzInlineCollapsed]="isCollapsed">
+<ul nz-menu nzTheme="dark" [nzMode]="'inline'" [nzInlineCollapsed]="isCollapsed()">
   @for (menu of menus; track menu) {
     @if (!menu.submenus) {
       <li nz-menu-item [routerLink]="menu.path" [routerLinkActive]="'ant-menu-item-selected'">

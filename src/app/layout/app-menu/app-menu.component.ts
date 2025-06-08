@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AppMenu, APP_MENUS } from '../../menus';
@@ -27,7 +27,7 @@ interface AppMenuEx extends AppMenu {
 export class AppMenuComponent {
   private readonly router = inject(Router);
 
-  @Input() isCollapsed: boolean;
+  readonly isCollapsed = input<boolean>(undefined);
   menus: AppMenuEx[];
   currentUrl: string;
 
